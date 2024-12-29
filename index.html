@@ -69,7 +69,7 @@
     <div class="spinner" id="spinner"></div>
     <div class="emscripten" id="status">Downloading...</div>
     <span id="controls">
-      <span><input onclick='location.href="https://github.com/kang889/lim-kang-ping-portfolio/tree/main/Projects/FEED_THE_SNAKE_GAME"' type="button" value="📜 SOURCE CODE"></span>
+      <span><input onclick='location.href="https://github.com/raysan5/raylib"' type="button" value="📜 SOURCE CODE"></span>
       <span><input onclick="Module.requestFullscreen(!1,!1)" type="button" value="🖵 FULLSCREEN"></span>
       <span><input onclick="toggleAudio()" type="button" value="🔇 MUTE" id="btn-audio"></span>
     </span>
@@ -82,7 +82,7 @@
 
   </div><div id="instructions">
     <h2>Instructions</h2>
-    <p>Use the arrow keys to move the snake around the screen. Avoid the border and its tail! eat the food to grow the snake!</p>
+    <p>Use the arrow keys to move the character around the screen. Avoid obstacles and collect items to earn points!</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"></script>
@@ -155,7 +155,7 @@
     self.AudioContext = new Proxy(self.AudioContext, {
       construct(t, e) {
         const n = new t(...e);
-        return audioContexList.push(n), "suspended" == n.state && (audioBtn.value = "🔈 MUSIC"),
+        return audioContexList.push(n), "suspended" == n.state && (audioBtn.value = "🔈 RESUME"),
         n;
       }
     });
