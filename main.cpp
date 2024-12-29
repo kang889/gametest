@@ -4,22 +4,19 @@
 #include <raymath.h>
 
 using namespace std;
-
-static bool allowMove = false;
-Color green = {173, 204, 96, 255};
+Color beige = {211, 176, 131, 255};
 Color darkGreen = {43, 51, 24, 255};
 
-int cellSize = 30;
-int cellCount = 25;
-int offset = 75;
-
-double lastUpdateTime = 0;
+int cellsize = 35;
+int cellcount = 20;
+int offset = 55;
+double lastupdatetime = 0;
 
 bool ElementInDeque(Vector2 element, deque<Vector2> deque)
 {
-    for (unsigned int i = 0; i < deque.size(); i++)
+    for (unsigned int i = 0; i <deque.size(); i++)
     {
-        if (Vector2Equals(deque[i], element))
+        if(Vector2Equals(deque[i], element))
         {
             return true;
         }
@@ -27,31 +24,33 @@ bool ElementInDeque(Vector2 element, deque<Vector2> deque)
     return false;
 }
 
-bool EventTriggered(double interval)
+bool eventTriggered(double interval)
 {
-    double currentTime = GetTime();
-    if (currentTime - lastUpdateTime >= interval)
+    double currenttime = GetTime();
+    if(currenttime - lastupdatetime >= interval)
     {
-        lastUpdateTime = currentTime;
+        lastupdatetime = currenttime;
         return true;
     }
     return false;
+
 }
 
 class Snake
-{
-public:
+ {
+    public:
     deque<Vector2> body = {Vector2{6, 9}, Vector2{5, 9}, Vector2{4, 9}};
     Vector2 direction = {1, 0};
-    bool addSegment = false;
+    bool addsegment = false;
+
 
     void Draw()
     {
-        for (unsigned int i = 0; i < body.size(); i++)
+        for(unsigned int i = 0; i < body.size(); i++)
         {
             float x = body[i].x;
             float y = body[i].y;
-            Rectangle segment = Rectangle{offset + x * cellSize, offset + y * cellSize, (float)cellSize, (float)cellSize};
+            Rectangle segment = Rectangle{offset + x * cellsize, offset + y * cellsize, (float)cellsize, (float)cellsize};
             DrawRectangleRounded(segment, 0.5, 6, darkGreen);
         }
     }
@@ -59,59 +58,58 @@ public:
     void Update()
     {
         body.push_front(Vector2Add(body[0], direction));
-        if (addSegment == true)
+        if(addsegment == true)
         {
-            addSegment = false;
+            addsegment = false;
         }
         else
         {
-            body.pop_back();
+        body.pop_back();
+        
         }
     }
 
     void Reset()
     {
-        body = {Vector2{6, 9}, Vector2{5, 9}, Vector2{4, 9}};
-        direction = {1, 0};
+        body = {Vector2{6,9}, Vector2{5,9}, Vector2{4,9}};
+        direction = {1,0};
     }
 };
 
-class Food
-{
-
+class Food {
 public:
     Vector2 position;
     Texture2D texture;
 
+    // Constructor
     Food(deque<Vector2> snakeBody)
-    {
-        Image image = LoadImage("Graphics/food.png");
-        texture = LoadTextureFromImage(image);
-        UnloadImage(image);
-        position = GenerateRandomPos(snakeBody);
+     {
+        Image image = LoadImage("Graphics/food.png");  // Load image from file
+        texture = LoadTextureFromImage(image);         // Convert image to texture
+        UnloadImage(image);        
+        position = GenerateRandomPos(snakeBody);                  // Unload image from memory
     }
 
-    ~Food()
-    {
-        UnloadTexture(texture);
+    // Destructor
+    ~Food() {
+        UnloadTexture(texture);                        // Free texture resources
     }
 
-    void Draw()
-    {
-        DrawTexture(texture, offset + position.x * cellSize, offset + position.y * cellSize, WHITE);
+    // Draw function
+    void Draw() {
+        DrawTexture(texture, offset + position.x * cellsize, offset + position.y * cellsize, WHITE);
     }
 
     Vector2 GenerateRandomCell()
-    {
-        float x = GetRandomValue(0, cellCount - 1);
-        float y = GetRandomValue(0, cellCount - 1);
+    {        float x = GetRandomValue(0, cellcount - 1);
+        float y = GetRandomValue(0, cellcount - 1);
         return Vector2{x, y};
     }
-
+    
     Vector2 GenerateRandomPos(deque<Vector2> snakeBody)
     {
         Vector2 position = GenerateRandomCell();
-        while (ElementInDeque(position, snakeBody))
+        while(ElementInDeque(position, snakeBody))
         {
             position = GenerateRandomCell();
         }
@@ -119,9 +117,9 @@ public:
     }
 };
 
-class Game
+class Game 
 {
-public:
+    public:
     Snake snake = Snake();
     Food food = Food(snake.body);
     bool running = true;
@@ -143,44 +141,49 @@ public:
         CloseAudioDevice();
     }
 
-    void Draw()
+
+    void draw()
     {
-        food.Draw();
         snake.Draw();
+        food.Draw();
     }
 
-    void Update()
+    void update()
     {
         if (running)
         {
             snake.Update();
-            CheckCollisionWithFood();
-            CheckCollisionWithEdges();
-            CheckCollisionWithTail();
+            Checkcollisionwithfood();
+            Checkcollisionwithedge();
+            Checkcollisionwithtail();
         }
-    }
+        }
+        
 
-    void CheckCollisionWithFood()
+    void Checkcollisionwithfood()
     {
-        if (Vector2Equals(snake.body[0], food.position))
+        if(Vector2Equals(snake.body[0], food.position))
         {
             food.position = food.GenerateRandomPos(snake.body);
-            snake.addSegment = true;
-            score++;
+            snake.addsegment = true;
+            score ++;
             PlaySound(eatSound);
         }
+
+
     }
 
-    void CheckCollisionWithEdges()
+    void Checkcollisionwithedge()
     {
-        if (snake.body[0].x == cellCount || snake.body[0].x == -1)
+        if(snake.body[0].x == cellcount || snake.body[0].x == -1)
         {
             GameOver();
         }
-        if (snake.body[0].y == cellCount || snake.body[0].y == -1)
+        if(snake.body[0].y == cellcount || snake.body[0].y == -1)
         {
             GameOver();
         }
+    
     }
 
     void GameOver()
@@ -192,69 +195,68 @@ public:
         PlaySound(wallSound);
     }
 
-    void CheckCollisionWithTail()
+    void Checkcollisionwithtail()
     {
-        deque<Vector2> headlessBody = snake.body;
-        headlessBody.pop_front();
-        if (ElementInDeque(snake.body[0], headlessBody))
+        deque<Vector2> headlessbody = snake.body;
+        headlessbody.pop_front();
+        if (ElementInDeque(snake.body[0],headlessbody))
         {
             GameOver();
         }
     }
 };
 
-int main()
-{
-    cout << "Starting the game..." << endl;
-    InitWindow(2 * offset + cellSize * cellCount, 2 * offset + cellSize * cellCount, "Retro Snake");
+int main() {
+    cout << "Starting the game....." << endl;
+    
+    // Initialize window
+    InitWindow(2*offset + cellsize * cellcount, 2*offset + cellsize * cellcount, "retro snake");
     SetTargetFPS(60);
-
     Game game = Game();
 
-    while (WindowShouldClose() == false)
-    {
+
+
+    // Game loop
+    while (!WindowShouldClose()) {  // Simplified check for window closing
         BeginDrawing();
-
-        if (EventTriggered(0.2))
+        if (eventTriggered(0.2))
         {
-            allowMove = true;
-            game.Update();
+            game.update();
         }
-
-        if (IsKeyPressed(KEY_UP) && game.snake.direction.y != 1 && allowMove)
+        if (IsKeyPressed(KEY_UP) && game.snake.direction.y != 1)
         {
             game.snake.direction = {0, -1};
             game.running = true;
-            allowMove = false;
         }
-        if (IsKeyPressed(KEY_DOWN) && game.snake.direction.y != -1 && allowMove)
+        if (IsKeyPressed(KEY_DOWN) && game.snake.direction.y != -1)
         {
             game.snake.direction = {0, 1};
             game.running = true;
-            allowMove = false;
         }
-        if (IsKeyPressed(KEY_LEFT) && game.snake.direction.x != 1 && allowMove)
+        if (IsKeyPressed(KEY_LEFT) && game.snake.direction.x != 1)
         {
             game.snake.direction = {-1, 0};
             game.running = true;
-            allowMove = false;
         }
-        if (IsKeyPressed(KEY_RIGHT) && game.snake.direction.x != -1 && allowMove)
+        if (IsKeyPressed(KEY_RIGHT) && game.snake.direction.x != -1)
         {
             game.snake.direction = {1, 0};
             game.running = true;
-            allowMove = false;
         }
 
-        // Drawing
-        ClearBackground(green);
-        DrawRectangleLinesEx(Rectangle{(float)offset - 5, (float)offset - 5, (float)cellSize * cellCount + 10, (float)cellSize * cellCount + 10}, 5, darkGreen);
-        DrawText("Retro Snake", offset - 5, 20, 40, darkGreen);
-        DrawText(TextFormat("%i", game.score), offset - 5, offset + cellSize * cellCount + 10, 40, darkGreen);
-        game.Draw();
+        // Clear the background
+        ClearBackground(beige);
+        DrawText("FEED THE SNAKE", offset -5, 20, 40, darkGreen);
+        DrawText(TextFormat("%i", game.score), offset - 5, offset+cellsize * cellcount+10, 40, darkGreen);
+        // Draw food
+        game.draw();
+        DrawRectangleLinesEx(Rectangle{(float)offset-5,(float)offset-5, (float)cellsize * cellcount+10, (float)cellsize * cellcount+10}, 5, darkGreen);
 
         EndDrawing();
     }
+
+    // Close window and cleanup
     CloseWindow();
+
     return 0;
 }
